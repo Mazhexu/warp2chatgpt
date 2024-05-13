@@ -51,14 +51,14 @@ def read_config():
 # 修改config.json文件
 def modify_config(config):
     # 如果routing不存在，则创建routing对象，并向rules数组插入一个对象
-    print("开始更新配置文件......")
+    print("start update config file......")
     if 'routing' not in config:
         config['routing'] = {
             'domainStrategy': 'AsIs',
             'rules': [
                 {
                     'type': 'field',
-                    'domain': ['openai.com', 'ai.com'],
+                    'domain': ['openai.com', 'ai.com', 'chatgpt.com'],
                     'outboundTag': 'WARP'
                 }
             ]
@@ -99,30 +99,30 @@ def modify_config(config):
     # 保存修改后的config.json文件
     with open('/usr/local/etc/xray/config.json', 'w') as f:
         json.dump(config, f, indent=4)
-    print('更新配置文件成功！')
+    print('update config success！')
 
 # 重启xray
 def restart_xray():
-    print("正在重启xray......")
+    print("restarting xray......")
     subprocess.run(['systemctl', 'restart', 'xray'])
-    print("重启完毕！")
+    print("restart success！")
 
 # 执行操作
-print('检查是否安装xray......')
+print('check installed xray......')
 if not check_xray_installed():
-    print('本机未检测到xray,请先安装xray!')
+    print('no xray found!')
 else:
-    print("检查是否安装warp......")
+    print("check installed warp......")
     if not check_warp_installed():
-        print("开始安装warp......")
+        print("start install warp......")
         install_warp()
-    print("已安装warp!")
+    print("warp install success!")
 
     os.system("warp-cli connect")
 
-    print("检查是否连通chat.openai.com......")
+    print("check chat.openai.com......")
     if 0 == os.system("curl chat.openai.com --proxy socks5://127.0.0.1:40000"):
-        print("连通chat.openai.com成功！")
+        print("chat.openai.com connect success！")
 
     config = read_config()
     modify_config(config)
